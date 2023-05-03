@@ -1,0 +1,35 @@
+#!/usr/bin/env sh
+
+NNN_PREVIEWDIR="${NNN_PREVIEWDIR:-${TMPDIR:-/tmp}/nnn/previews}"
+
+make_thumbs() {
+    mkdir -p "$NNN_PREVIEWDIR$dir" || return
+    for file in "$dir"/*; do
+        if [ ! -f "$NNN_PREVIEWDIR$file.jpg" ]; then
+            case "$(file -bL --mime-type -- "$file")" in
+                audio/*) [ "$1" != "sxiv" ] &&
+                    ffmpeg -i "$file" "$NNN_PREVIEWDIR$file.jpg" -y >/dev/null 2>&1 ;;
+                video/*) [ "$1" != "ucollage" ] &&
+                    ffmpegthumbnailer -i "$file" -o "$NNN_PREVIEWDIR$file.jpg" 2> /dev/null ;;
+            esac
+        fi
+    done
+    for file in "$NNN_PREVIEWDIR$dir"/*; do
+        filename="$(basename "$file" .jpg)"
+        [ ! -e "$dir/$filename" ] && rm "$file" 2>/dev/null
+    done
+}
+
+listimages() {
+    find -L "$dir" "$NNN_PREVIEWDIR$dir" -maxdepth 1 -type f -print0 2>/dev/null | sort -z
+}
+
+view_files() {
+    [ -f "$target" ] && count="-n $(listimages | grep -a -m 1 -ZznF "$target" | cut -d: -f1)"
+    listimages | xargs -0 sxiv -a "${count:--t}"
+}
+
+target="$(readlink -f "$1")"
+[ -d "$target" ] && dir="$target" || dir="${target%/*}"
+type ffmpegthumbnailer >/dev/null 2>&1 && make_thumbs sxiv
+view_files sxiv >/dev/null 2>&1 &
