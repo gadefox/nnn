@@ -8,7 +8,7 @@
 <a href="https://en.wikipedia.org/wiki/Privacy-invasive_software"><img src="https://img.shields.io/badge/privacy-✓-crimson?maxAge=2592000" alt="Privacy Awareness" /></a>
 <a href="https://github.com/jarun/nnn/blob/master/LICENSE"><img src="https://img.shields.io/badge/©-BSD%202--Clause-important.svg?maxAge=2592000" alt="License" /></a>
 </p>
-<img src="https://i.imgur.com/FUb0TaM.png"><br>
+<p align="center"><img src="https://i.imgur.com/FUb0TaM.png"></p>
 
 <p align="center"><a href="http://i.imgur.com/kOld6HT.gif"><img src="https://i.imgur.com/NUsSA2u.jpg"></a></p>
 
