@@ -9,7 +9,7 @@ PKG_CONFIG ?= pkg-config
 INSTALL ?= install
 CP ?= cp
 
-CFLAGS_OPTIMIZATION ?= -O2
+CFLAGS_OPTIMIZATION ?= -O3
 
 O_DEBUG := 0  # debug binary
 O_NORL := 0  # no readline support
@@ -20,7 +20,8 @@ O_NOBATCH := 0  # no built-in batch renamer
 O_NOFIFO := 0  # no FIFO previewer support
 O_CTX8 := 0  # enable 8 contexts
 O_ICONS := 0  # support icons-in-terminal
-O_NERD := 0  # support icons-nerdfont
+O_NERD := 1  # support icons-nerdfont
+O_NOIND := 1  # support file type
 O_EMOJI := 0  # support emoji
 O_QSORT := 0  # use Alexey Tourbin's QSORT implementation
 O_BENCH := 0  # benchmark mode (stops at first user input)
@@ -51,7 +52,9 @@ endif
 
 ifeq ($(strip $(O_DEBUG)),1)
 	CPPFLAGS += -DDEBUG
-	CFLAGS += -g
+	CFLAGS += -g3
+else
+	CFLAGS += $(CFLAGS_OPTIMIZATION)
 endif
 
 ifeq ($(strip $(O_NORL)),1)
@@ -77,6 +80,10 @@ $(info *** Ignoring O_NOLC since O_EMOJI is set ***)
 	else
 		CPPFLAGS += -DNOLC
 	endif
+endif
+
+ifeq ($(strip $(O_NOIND)),1)
+	CPPFLAGS += -DNOIND
 endif
 
 ifeq ($(strip $(O_NOMOUSE)),1)
@@ -149,7 +156,6 @@ else
 endif
 
 CFLAGS += -std=c11 -Wall -Wextra -Wshadow
-CFLAGS += $(CFLAGS_OPTIMIZATION)
 CFLAGS += $(CFLAGS_CURSES)
 
 LDLIBS += $(LDLIBS_CURSES) -lpthread
