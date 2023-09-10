@@ -28,7 +28,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _FILE_OFFSET_BITS 64 /* Support large files on 32-bit */
+#define _FILE_OFFSET_BITS 64 /* Support large files on 32-bit glibc */
 
 #if defined(__linux__) || defined(MINGW) || defined(__MINGW32__) \
 	|| defined(__MINGW64__) || defined(__CYGWIN__)
@@ -132,13 +132,24 @@
 #include "icons.h"
 #endif
 
+#if defined(ICONS_ENABLED) && defined(__APPLE__)
+/*
+ * For some reason, wcswidth returns 2 for certain icons on macOS
+ * leading to duplicated first characters in filenames when navigating.
+ * https://github.com/jarun/nnn/issues/1692
+ * There might be a better way to fix it without requiring a refresh.
+ */
+#define macos_icons_hack() do { clrtoeol(); refresh(); } while(0)
+#else
+#define macos_icons_hack()
+#endif
+
 #ifdef TOURBIN_QSORT
 #include "qsort.h"
 #endif
 
 /* Macro definitions */
-#define VERSION      "4.8"
-#define GENERAL_INFO "BSD 2-Clause\nhttps://github.com/jarun/nnn"
+#define VERSION      "4.9"
 
 #ifndef NOSSN
 #define SESSIONS_VERSION 1
@@ -765,7 +776,7 @@ static const char * const patterns[] = {
 	SED" -i 's|^\\(\\(.*/\\)\\(.*\\)$\\)|#\\1\\n\\3|' %s",
 	SED" 's|^\\([^#/][^/]\\?.*\\)$|%s/\\1|;s|^#\\(/.*\\)$|\\1|' "
 		"%s | tr '\\n' '\\0' | xargs -0 -n2 sh -c '%s \"$0\" \"$@\" < /dev/tty'",
-	"\\.(bz|bz2|gz|tar|taz|tbz|tbz2|tgz|z|zip)$", /* Basic formats that don't need external tools */
+	"\\.(bz|bz2|gz|xz|tar|taz|tbz|tbz2|tgz|z|zip)$", /* Basic formats that don't need external tools */
 	SED" -i 's|^%s\\(.*\\)$|%s\\1|' %s",
 	"xargs -0 %s %s < '%s'",
 };
@@ -5188,49 +5199,44 @@ static void add_bookmark(char *path, char *newpath, int *presel)
 static void show_help(const char *path)
 {
 	static const char helpstr[] = {
-	"2|V\\_\n"
-	"2/. \\\\\n"
-	"1(;^; ||\n"
-	"3/___3\n"
-	"2(___n))\n"
-	"0\n"
 	"1NAVIGATION\n"
-	       "9Up k  Up%16PgUp ^U  Page up\n"
-	       "9Dn j  Down%14PgDn ^D  Page down\n"
-	       "9Lt h  Parent%12~ ` @ -  ~, /, start, prev\n"
-	   "5Ret Rt l  Open%20'  First file/match\n"
-	       "9g ^A  Top%21J  Jump to entry/offset\n"
-	       "9G ^E  End%20^J  Toggle auto-advance on open\n"
-	      "8B (,)  Book(mark)%11b ^/  Select bookmark\n"
-		"a1-4  Context%11(Sh)Tab  Cycle/new context\n"
-	    "62Esc ^Q  Quit%20q  Quit context\n"
-		 "b^G  QuitCD%18Q  Pick/err, quit\n"
+	         "bUp  Up%19PgUp  Page up\n"
+	         "bDn  Down%17PgDn  Page down\n"
+	         "bLt  Parent%12~ ` @ -  ~, /, start, prev\n"
+	     "7Ret Rt  Open%20'  First file/match\n"
+  	     "9Home  Top%21j  Jump to entry/offset\n"
+  	      "aEnd  Bottom%18y  Jump to young file/folder\n"
+	          "cJ  Toggle auto-advance on open\n"
+	      "8B (,)  Book(mark)%14b  Select bookmark\n"
+      		"a1-4  Context%11(Sh)Tab  Cycle/new context\n"
+	     "7Esc ^Q  Quit%20q  Quit context\n"
+		       "b^G  QuitCD%18Q  Pick/err, quit\n"
 	"0\n"
 	"1FILTER & PROMPT\n"
-		  "c/  Filter%17^N  Toggle type-to-nav\n"
-		"aEsc  Exit prompt%12^L  Toggle last filter\n"
-		  "c.  Toggle hidden%05Alt+Esc  Unfilter, quit context\n"
+      		  "c/  Filter%17^N  Toggle type-to-nav\n"
+      		"aEsc  Exit prompt%12^L  Toggle last filter\n"
+      		  "c.  Toggle hidden%05Alt+Esc  Unfilter, quit context\n"
 	"0\n"
 	"1FILES\n"
-	       "9o ^O  Open with%15n  Create new/link\n"
-	       "9f ^F  File stats%14d  Detail mode toggle\n"
-		 "b^R  Rename/dup%14r  Batch rename\n"
-		  "cz  Archive%17e  Edit file\n"
-		  "c*  Toggle exe%14>  Export list\n"
-	    "6Space +  (Un)select%12m-m  Select range/clear\n"
+	          "co  Open with%15n  Create new/link\n"
+	          "cf  File stats%14d  Detail mode toggle\n"
+		        "cr  Rename/dup%14R  Batch rename\n"
+		        "cz  Archive%17e  Edit file\n"
+		        "c*  Toggle exe%14>  Export list\n"
+	  "4Space Ins  (Un)select%12m-m  Select range/clear\n"
 	          "ca  Select all%14A  Invert sel\n"
-	       "9p ^P  Copy here%12w ^W  Cp/mv sel as\n"
-	       "9v ^V  Move here%15E  Edit sel list\n"
-	       "9x ^X  Delete%18S  Listed sel size\n"
-		"aEsc  Send to FIFO\n"
+	          "cp  Copy here%15w  Cp/mv sel as\n"
+   	        "cv  Move here%15E  Edit sel list\n"
+	        "aDel  Delete%18S  Listed sel size\n"
+      		"aEsc  Send to FIFO\n"
 	"0\n"
 	"1MISC\n"
-	      "8Alt ;  Select plugin%11=  Launch app\n"
-	       "9! ^]  Shell%19]  Cmd prompt\n"
-		  "cc  Connect remote%10u  Unmount remote/archive\n"
-	       "9t ^T  Sort toggles%12s  Manage session\n"
-		  "cT  Set time type%110  Lock\n"
-		 "b^L  Redraw%18?  Help, conf\n"
+	          "c;  Select plugin%11=  Launch app\n"
+	          "c!  Shell%19]  Cmd prompt\n"
+      		  "cc  Connect remote%10u  Unmount remote/archive\n"
+	          "ct  Sort toggles%12s  Manage session\n"
+      		  "cT  Set time type%110  Lock\n"
+      		 "b^R  Redraw%18?  Help, conf\n"
 	};
 
 	int fd = create_tmp_file();
@@ -5288,7 +5294,7 @@ static void show_help(const char *path)
 	if (selpath)
 		dprintf(fd, "SELECTION FILE: %s\n", selpath);
 
-	dprintf(fd, "\nv%s\n%s\n", VERSION, GENERAL_INFO);
+	dprintf(fd, "\nv%s\n", VERSION);
 	close(fd);
 
 	spawn(pager, g_tmpfpath, NULL, NULL, F_CLI | F_TTY);
@@ -6166,20 +6172,10 @@ static void handle_screen_move(enum action sel)
 		move_cursor(curscroll + (onscreen - 1), 1);
 		curscroll += onscreen - 1;
 		break;
-	case SEL_CTRL_D:
-		onscreen = xlines - 4;
-		move_cursor(curscroll + (onscreen - 1), 1);
-		curscroll += onscreen >> 1;
-		break;
 	case SEL_PGUP:
 		onscreen = xlines - 4;
 		move_cursor(curscroll, 1);
 		curscroll -= onscreen - 1;
-		break;
-	case SEL_CTRL_U:
-		onscreen = xlines - 4;
-		move_cursor(curscroll, 1);
-		curscroll -= onscreen >> 1;
 		break;
 	case SEL_JUMP:
 	{
@@ -6213,7 +6209,21 @@ static void handle_screen_move(enum action sel)
 	case SEL_END:
 		move_cursor(ndents - 1, 1);
 		break;
-	default: /* case SEL_FIRST */
+	case SEL_YOUNG:
+	{
+		for (int r = cur;;) {
+			if (++r >= ndents)
+				r = 0;
+			if (r == cur)
+				break;
+			if (pdents[r].flags & FILE_YOUNG) {
+				move_cursor(r, 0);
+				break;
+			}
+		}
+		break;
+	}
+  default: /* case SEL_FIRST */
 	{
 		int c = get_input(messages[MSG_FIRST]);
 
@@ -6607,6 +6617,7 @@ static void draw_line(int ncols)
 	}
 
 	move(2 + last - curscroll, 0);
+  macos_icons_hack();
 	printent(&pdents[last], ncols, FALSE);
 
 	if (g_state.oldcolor && (pdents[cur].flags & DIR_OR_DIRLNK)) {
@@ -6620,6 +6631,7 @@ static void draw_line(int ncols)
 	}
 
 	move(2 + cur - curscroll, 0);
+  macos_icons_hack();
 	printent(&pdents[cur], ncols, TRUE);
 
 	/* Must reset e.g. no files in dir */
@@ -7292,13 +7304,12 @@ nochange:
 		case SEL_NEXT: // fallthrough
 		case SEL_PREV: // fallthrough
 		case SEL_PGDN: // fallthrough
-		case SEL_CTRL_D: // fallthrough
 		case SEL_PGUP: // fallthrough
-		case SEL_CTRL_U: // fallthrough
 		case SEL_HOME: // fallthrough
 		case SEL_END: // fallthrough
 		case SEL_FIRST: // fallthrough
 		case SEL_JUMP:
+    case SEL_YOUNG:
 			if (ndents) {
 				g_state.move = 1;
 				handle_screen_move(sel);
@@ -8383,7 +8394,6 @@ static void usage(void)
 {
 	dprintf(STDOUT_FILENO,
 		"%s: nnn [OPTIONS] [PATH]\n\n"
-		"The unorthodox terminal file manager.\n\n"
 		"positional args:\n"
 		"  PATH   start dir/file [default: .]\n\n"
 		"optional args:\n"
@@ -8433,7 +8443,7 @@ static void usage(void)
 		" -x      notis, selection sync, xterm title\n"
 #endif
 		" -h      show help\n\n"
-		"v%s\n%s\n", __func__, VERSION, GENERAL_INFO);
+		"v%s\n", __func__, VERSION);
 }
 
 static bool setup_config(void)
