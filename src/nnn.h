@@ -58,6 +58,7 @@ enum action {
 	SEL_END,
 	SEL_FIRST,
 	SEL_JUMP,
+  SEL_YOUNG,
 	SEL_CDHOME,
 	SEL_CDBEGIN,
 	SEL_CDLAST,
@@ -131,39 +132,27 @@ struct key {
 static struct key bindings[] = {
 	/* Back */
 	{ KEY_LEFT,       SEL_BACK },
-	{ 'h',            SEL_BACK },
 	/* Inside or select */
 	{ KEY_ENTER,      SEL_OPEN },
-	{ '\r',           SEL_OPEN },
 	/* Pure navigate inside */
 	{ KEY_RIGHT,      SEL_NAV_IN },
-	{ 'l',            SEL_NAV_IN },
 	/* Next */
-	{ 'j',            SEL_NEXT },
 	{ KEY_DOWN,       SEL_NEXT },
 	/* Previous */
-	{ 'k',            SEL_PREV },
 	{ KEY_UP,         SEL_PREV },
 	/* Page down */
 	{ KEY_NPAGE,      SEL_PGDN },
 	/* Page up */
 	{ KEY_PPAGE,      SEL_PGUP },
-	/* Ctrl+D */
-	{ CONTROL('D'),   SEL_CTRL_D },
-	/* Ctrl+U */
-	{ CONTROL('U'),   SEL_CTRL_U },
 	/* First entry */
 	{ KEY_HOME,       SEL_HOME },
-	{ 'g',            SEL_HOME },
-	{ CONTROL('A'),   SEL_HOME },
 	/* Last entry */
 	{ KEY_END,        SEL_END },
-	{ 'G',            SEL_END },
-	{ CONTROL('E'),   SEL_END },
 	/* Go to first file */
 	{ '\'',           SEL_FIRST },
 	/* Jump to an entry number/offset */
-	{ 'J',            SEL_JUMP },
+	{ 'j',            SEL_JUMP },
+  { 'y',   SEL_YOUNG },
 	/* HOME */
 	{ '~',            SEL_CDHOME },
 	/* Initial directory */
@@ -174,7 +163,6 @@ static struct key bindings[] = {
 	{ '`',            SEL_CDROOT },
 	/* Leader key */
 	{ 'b',            SEL_BMOPEN },
-	{ CONTROL('_'),   SEL_BMOPEN },
 	/* Connect to server over SSHFS */
 	{ 'c',            SEL_REMOTE },
 	/* Cycle contexts in forward direction */
@@ -199,26 +187,23 @@ static struct key bindings[] = {
 	/* Filter */
 	{ '/',            SEL_FLTR },
 	/* Toggle filter mode */
-	{ CONTROL('N'),   SEL_MFLTR },
+	{ CONTROL('n'),   SEL_MFLTR },
 	/* Toggle hide .dot files */
 	{ '.',            SEL_HIDDEN },
 	/* Detailed listing */
 	{ 'd',            SEL_DETAIL },
 	/* File details */
 	{ 'f',            SEL_STATS },
-	{ CONTROL('F'),   SEL_STATS },
 	/* Toggle executable status */
 	{ '*',            SEL_CHMODX },
 	/* Create archive */
 	{ 'z',            SEL_ARCHIVE },
 	/* Sort toggles */
 	{ 't',            SEL_SORT },
-	{ CONTROL('T'),   SEL_SORT },
 	/* Redraw window */
-	{ CONTROL('L'),   SEL_REDRAW },
+	{ CONTROL('r'),   SEL_REDRAW },
 	/* Select current file path */
 	{ ' ',            SEL_SEL },
-	{ '+',            SEL_SEL },
   { KEY_IC,         SEL_SEL },
 	/* Toggle select multiple files */
 	{ 'm',            SEL_SELMUL },
@@ -230,32 +215,26 @@ static struct key bindings[] = {
 	{ 'E',            SEL_SELEDIT },
 	/* Copy from selection buffer */
 	{ 'p',            SEL_CP },
-	{ CONTROL('P'),   SEL_CP },
 	/* Move from selection buffer */
 	{ 'v',            SEL_MV },
-	{ CONTROL('V'),   SEL_MV },
 	/* Copy/move from selection buffer and rename */
 	{ 'w',            SEL_CPMVAS },
-	{ CONTROL('W'),   SEL_CPMVAS },
 	/* Delete from selection buffer */
-	{ 'x',            SEL_RM },
-	{ CONTROL('X'),   SEL_RM },
   { KEY_DC,         SEL_RM },
 	/* Open in a custom application */
 	{ 'o',            SEL_OPENWITH },
-	{ CONTROL('O'),   SEL_OPENWITH },
 	/* Create a new file */
 	{ 'n',            SEL_NEW },
 	/* Show rename prompt */
-	{ CONTROL('R'),   SEL_RENAME },
+	{ 'r',            SEL_RENAME },
 	/* Rename contents of current dir */
-	{ 'r',            SEL_RENAMEMUL },
+	{ 'R',            SEL_RENAMEMUL },
 	/* Disconnect a SSHFS mount point */
 	{ 'u',            SEL_UMOUNT },
 	/* Show help */
 	{ '?',            SEL_HELP },
 	/* Toggle auto-advance on file open */
-	{ CONTROL('J'),   SEL_AUTONEXT },
+	{ 'J',            SEL_AUTONEXT },
 	/* Edit in EDITOR */
 	{ 'e',            SEL_EDIT },
 	/* Run a plugin */
@@ -264,7 +243,6 @@ static struct key bindings[] = {
 	{ 'S',            SEL_SELSIZE },
 	/* Run command */
 	{ '!',            SEL_SHELL },
-	{ CONTROL(']'),   SEL_SHELL },
 	/* Launcher */
 	{ '=',            SEL_LAUNCH },
 	/* Show command prompt */
@@ -280,9 +258,9 @@ static struct key bindings[] = {
 	/* Quit a context */
 	{ 'q',            SEL_QUITCTX },
 	/* Change dir on quit */
-	{ CONTROL('G'),   SEL_QUITCD },
+	{ CONTROL('g'),   SEL_QUITCD },
 	/* Quit */
-	{ CONTROL('Q'),   SEL_QUIT },
+	{ CONTROL('q'),   SEL_QUIT },
 	/* Quit with an error code */
 	{ 'Q',            SEL_QUITERR },
 #ifndef NOMOUSE
