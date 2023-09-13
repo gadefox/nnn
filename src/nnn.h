@@ -134,6 +134,7 @@ static struct key bindings[] = {
 	{ KEY_LEFT,       SEL_BACK },
 	/* Inside or select */
 	{ KEY_ENTER,      SEL_OPEN },
+	{ '\r',           SEL_OPEN },
 	/* Pure navigate inside */
 	{ KEY_RIGHT,      SEL_NAV_IN },
 	/* Next */
