@@ -84,7 +84,7 @@
 #define ICON_MAKEFILE      ICON_STR(FILE_CMAKE, "", "🛠 ")
 #define ICON_MANUAL        ICON_STR(FILE_MANPAGE, "󱓷", "❓")
 #define ICON_MS_EXCEL      ICON_STR(FILE_EXCEL, "󰈛", ICON_WORDDOC)
-#define ICON_MUSIC         ICON_STR(FA_MUSIC, "", "🎧")
+#define ICON_MUSIC         ICON_STR(FA_MUSIC, "󰌳", "🎧")
 #define ICON_MUSICFILE     ICON_STR(FA_FILE_AUDIO_O, "󰎈", ICON_MUSIC)
 #define ICON_OPTICALDISK   ICON_STR(LINEA_MUSIC_CD, "", "💿")
 #define ICON_PDF           ICON_STR(FA_FILE_PDF_O, "", "📕")
@@ -108,7 +108,7 @@
 #define ICON_VIM           ICON_STR(DEV_VIM, "", "")
 #define ICON_WORDDOC       ICON_STR(FILE_WORD, "󰈬", "📘")
 
-#define ICON_EXT_ASM       ICON_STR(FILE_NASM, "", "")
+#define ICON_EXT_ASM       ICON_STR(FILE_NASM, "", "")
 #define ICON_EXT_BIN       ICON_STR(OCT_FILE_BINARY, "", "📓")
 #define ICON_EXT_COFFEE    ICON_STR(MFIZZ_COFFEE_BEAN, "", "")
 #define ICON_EXT_CSS       ICON_STR(MFIZZ_CSS3, "", "🦋")
