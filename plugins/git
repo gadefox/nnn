@@ -1,0 +1,28 @@
+#!/bin/rc
+
+. /usr/local/libexec/rc/dmenu
+. /usr/local/libexec/rc/nnn
+. /usr/local/libexec/rc/notify
+
+notify_icon = git
+notify_title = GitHub:
+
+key = `nnn_read
+~ $key () && exit 1
+opt = `(choose_menu Status Checkin Clear)
+~ $opt () && exit 1
+
+fn nnn_handle_dir {
+  if (test -d $1) {
+    ~ $opt 1 || echo $1
+    cd $1
+    git-tool $2
+  } else {
+    show_notify $1' is not a directory.'
+  }
+}
+
+nnn_handle $key $2/$1 $opt
+~ $opt 1 || nnn_key
+
+exit 0
