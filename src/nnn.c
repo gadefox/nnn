@@ -437,8 +437,7 @@ static settings cfg = {
 	.ctxactive = 1,
 	.autoenter = 1,
 	.timetype = 2, /* T_MOD */
-	.rollover = 1,
-    .showhidden = 1
+	.rollover = 1
 };
 
 alignas(max_align_t) static context g_ctx[CTX_MAX];
