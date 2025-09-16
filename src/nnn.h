@@ -222,8 +222,8 @@ static struct key bindings[] = {
 	/* Copy/move from selection buffer and rename */
 	{ 'w',            SEL_CPMVAS },
 	/* Delete from selection buffer */
-	{ KEY_DC,         SEL_TRASH },
-	{ KEY_SDC,        SEL_RM_RF },
+	{ KEY_DC,         SEL_RM_RF },
+	{ KEY_SDC,        SEL_TRASH },
 	/* Open in a custom application */
 	{ 'o',            SEL_OPENWITH },
 	/* Create a new file */
