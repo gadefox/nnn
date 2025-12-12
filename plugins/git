@@ -20,5 +20,5 @@ fn nnn_item {
 }
 
 nnn_handle $key $2/$1 $opt
-~ $opt 1 || nnn_key
+~ $opt 1 || `nnn_key
 exit 0
