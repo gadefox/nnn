@@ -1,0 +1,10 @@
+#!/usr/bin/rc
+. /usr/local/libexec/rc/nnn
+
+fn nnn_item { dragon -x $1 >[2] /dev/null & }
+
+key = `nnn_read
+~ $key () && exit 1
+
+nnn_handle $key $2/$1
+exit 0

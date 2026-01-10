@@ -1,0 +1,53 @@
+#!/usr/bin/rc
+. /usr/local/libexec/rc/nnn
+. /usr/local/libexec/rc/notify
+notify_icon = cloud
+notify_title = Share:
+#test = 1
+
+fn check {
+  ~ `{ grep -q '^https\?://' <<< $1 } 0 && notify_error 'Server did not return a valid URL.'
+  xsel -b -i <<< $1
+
+  msg = 'The URL has been copied to the clipboard.'
+  ~ $2 () && msg = 'The file has been uploaded.\n'$msg
+
+  opt = `(notify_show $msg '' o=Open)
+  notify_xdg $1 $opt
+  exit 0
+}
+
+fn text {
+  key = `(pass pastebin)
+  ~ $test () && exp = 6M || exp = 10M
+  check `(curl -s -X POST https://pastebin.com/api/api_post.php -d api_option=paste -d api_dev_key=$key -d api_paste_expire_date=$exp --data-urlencode api_paste_code@$1)
+}
+
+fn image {
+  key = `(pass imgbb)
+  ~ $test () && exp = 15552000 || exp = 60
+
+  json = `(curl -s -L -X POST https://api.imgbb.com/1/upload?key=$key'&'expiration=$exp -F image=@$1)
+  ~ `{ jq -r .success <<< $json } true && success `{ jq -r .data.url <<< $json }
+
+  msg = `{ jq -r .status_txt <<< $json }
+  notify_error 'Image upload failed.\nError: '$^msg
+}
+
+fn gzip {
+  check `(dropbox cp $1 /public) 1
+}
+
+~ `nnn_issel 0 && notify_error 'Multiple files are not allowed.'
+test -f $2/$1 || notify_error 'A file needs to be selected.'
+type = `(file -b $2/$1)
+
+switch ($type) {
+  case ASCII text
+    text $2/$1
+  case *image*
+    image $2/$1
+  case gzip*
+    gzip $2/$1
+}
+notify_error 'Unsupported file type: '$^type
