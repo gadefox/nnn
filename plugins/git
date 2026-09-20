@@ -6,19 +6,28 @@ notify_title = GitHub:
 
 key = `nnn_read
 ~ $key () && exit 1
+
 opt = `(nnn_dmenu Status Check-in Check-out Init Clear)
 ~ $opt () && exit 1
 
-fn nnn_item {
+fn handle {
   if (test -d $1) {
     ~ $opt 1 || echo $1
     cd $1
-    git-util $2
+    git-util $opt
   } else {
     notify_show $1' is not a directory.'
   }
 }
 
-nnn_handle $key $2/$1 $opt
+switch ($key) {
+  case c
+    handle $2/$1
+  case s
+    files = ``($nul) { cat $XDG_CONFIG_HOME/nnn/.selection }
+    for (f in $files)
+      handle $f
+}
+
 ~ $opt 1 || nnn_key
 exit 0
