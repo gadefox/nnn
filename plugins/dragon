@@ -1,10 +1,14 @@
 #!/usr/bin/rc
 . /usr/local/libexec/rc/nnn
 
-fn nnn_item { dragon -x $1 >[2] /dev/null & }
-
 key = `nnn_read
 ~ $key () && exit 1
 
-nnn_handle $key $2/$1
+switch ($key) {
+  case c
+    dragon -x $2/$1 >[2] /dev/null &
+  case s
+    xargs -0 dragon -a -x >[2] /dev/null < $XDG_CONFIG_HOME/nnn/.selection &
+}
+
 exit 0
