@@ -1,15 +1,18 @@
 #!/usr/bin/rc
 . /usr/local/libexec/rc/nnn
+. /usr/local/libexec/rc/notify
+notify_icon = bluetooth
+notify_title = Bluetooth:
 
-bluetooth 3
-~ $status 1 && exit 1
+state = `(systemctl is-active bluetooth)
+~ $state active || { notify_show 'No Adapters present.'; exit 1 }
 
 key = `nnn_read
 ~ $key () && exit 1
 
 switch ($key) {
   case c
-    blueman-sendto $2/$1 >[2] /dev/null
+    blueman-sendto $2/$1 >[2] /dev/null &
   case s
     xargs -0 blueman-sendto >[2] /dev/null < $XDG_CONFIG_HOME/nnn/.selection &
 }
